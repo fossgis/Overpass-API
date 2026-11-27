@@ -1,0 +1,2 @@
+REQUEST_METHOD=GET
+QUERY_STRING=data=[out:custom];node(1);out;&url=http://example.com/%0d%0aX-Injected:%201

@@ -1,0 +1,2 @@
+REQUEST_METHOD=GET
+QUERY_STRING=data=node(bbox);out;&bbox=7,51,8);node(id:1,52

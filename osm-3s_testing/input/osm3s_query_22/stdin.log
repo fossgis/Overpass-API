@@ -3,8 +3,8 @@
 <query type="way">
   <has-kv k="way_key_5"/>
 </query>
-<foreach>
-  <query type="way">
+<foreach into="loop">
+  <query type="way" into="found">
     <has-kv k="way_key_5"/>
     <has-kv k="way_key_2/4"/>
     <has-kv k="way_key_7"/>

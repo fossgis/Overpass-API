@@ -86,6 +86,8 @@ $BASEDIR/test-bin/run_unittests_output_csv.sh $DATA_SIZE $2
 
 $BASEDIR/test-bin/run_unittests_areas.sh $DATA_SIZE $2
 
+$BASEDIR/test-bin/run_unittests_implicit_areas.sh $DATA_SIZE $2
+
 if [[ $DATA_SIZE -gt 800 ]]; then
 {
   DATA_SIZE=800
@@ -98,3 +100,5 @@ $BASEDIR/test-bin/run_unittests_attic.sh $DATA_SIZE $2
 $BASEDIR/test-bin/run_unittests_vlt.sh $DATA_SIZE $2
 
 $BASEDIR/test-bin/run_testsuite_translate_xapi.sh $DATA_SIZE $2
+
+$BASEDIR/test-bin/run_testsuite_regressions.sh

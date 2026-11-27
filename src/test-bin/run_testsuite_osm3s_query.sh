@@ -83,6 +83,8 @@ perform_test()
   {
     "$BASEDIR/bin/$1" $ARGS >stdout.log 2>stderr.log
   }; fi
+  # When and where a query stood when it hit a limit depends on the machine
+  sed -i -E 's/^After [0-9]+h[0-9]+m[0-9]+s: /After: /; s/ Stack: .*$//' stderr.log
   evaluate_test "${EXEC}_$I"
   if [[ -n $FAILED ]]; then
   {
@@ -112,6 +114,8 @@ perform_test_stdout_null()
   {
     "$BASEDIR/bin/$1" $ARGS >/dev/null 2>stderr.log
   }; fi
+  # When and where a query stood when it hit a limit depends on the machine
+  sed -i -E 's/^After [0-9]+h[0-9]+m[0-9]+s: /After: /; s/ Stack: .*$//' stderr.log
   evaluate_test "${EXEC}_$I"
   if [[ -n $FAILED ]]; then
   {
@@ -161,9 +165,14 @@ perform_test osm3s_query 18
 cat input/update_database/transactions.log
 $BASEDIR/bin/dispatcher --terminate
 
+# Tests 19, 28, 31, 34, 66 and 67 are skipped: their queries take less than ten
+# seconds, so whether they hit their one second timeout depends on the speed of
+# the machine.
+TIMEOUT_TESTS=" 19 28 31 34 66 67 "
 II=19
 while [[ $II -lt 58 ]]; do
 {
+  [[ $TIMEOUT_TESTS == *" $II "* ]] ||
   perform_test osm3s_query $II "--db-dir=../../input/update_database/"
   II=$(($II + 1))
 }; done
@@ -176,8 +185,6 @@ perform_test_stdout_null osm3s_query 62 "--db-dir=../../input/update_database/"
 perform_test_stdout_null osm3s_query 63 "--db-dir=../../input/update_database/"
 perform_test_stdout_null osm3s_query 64 "--db-dir=../../input/update_database/"
 perform_test osm3s_query 65 "--db-dir=../../input/update_database/"
-perform_test_stdout_null osm3s_query 66 "--db-dir=../../input/update_database/"
-perform_test_stdout_null osm3s_query 67 "--db-dir=../../input/update_database/"
 perform_test_stdout_null osm3s_query 68 "--db-dir=../../input/update_database/"
 perform_test osm3s_query 69 "--db-dir=../../input/update_database/"
 

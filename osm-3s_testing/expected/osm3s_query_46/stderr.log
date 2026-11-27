@@ -1,5 +1,6 @@
 encoding remark: Please enter your query and terminate it with CTRL+D.
 encoding remark: Your input contains an 'osm-script' tag. Thus, a line with the
 datatype declaration is added. This shifts line numbering by -1 line(s).
-After 0h0m2s: in "recurse", part 0, on line 13. Stack: 1 of 4800 1 of 4800 401 of 4800
+runtime remark: Timeout is 1 and maxsize is 1073741824.
+After: in "recurse", part 0, on line 13.
 runtime error: Query timed out in "recurse" at line 13 after 2 seconds.

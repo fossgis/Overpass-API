@@ -1,0 +1,6 @@
+rel(1);
+nwr._(uid_touched:999999999);
+out count;
+rel(1);
+nwr._(uid_touched:1);
+out count;

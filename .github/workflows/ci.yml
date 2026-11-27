@@ -9,6 +9,11 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      - name: Turn on test-bin
+        run: |
+          cd osm-3s_testing
+          ./turn_testing_on.sh
+
       - name: Automake
         run: |
           cd src
@@ -17,6 +22,34 @@ jobs:
       - name: Configure & build
         run: |
           cd build
-          ../src/configure
-          make -j3
+          # With _GLIBCXX_ASSERTIONS, out-of-bounds indexing into strings and
+          # vectors aborts instead of reading past the end unnoticed.
+          ../src/configure --prefix="$GITHUB_WORKSPACE" CXXFLAGS="-g -O2 -D_GLIBCXX_ASSERTIONS"
+          make -j"$(nproc)" install
 
+      - name: Run the test suites
+        run: |
+          cd osm-3s_testing
+          ../test-bin/run_testsuite.sh 40 2>&1 | tee ../testsuite.log
+          echo "Tests reporting success: $(grep -c ' succeeded\.$' ../testsuite.log)"
+          if grep -q 'the tests haven.t compiled' ../testsuite.log \
+              || ! grep -q ' succeeded\.$' ../testsuite.log; then
+            echo "::error::The test suites did not run"
+            exit 1
+          fi
+          # Most suites report "Test X N FAILED." and diff -q's "Files A and B differ";
+          # the attic, vlt and implicit areas suites only report the latter.
+          if grep -E " FAILED\.$| differ$|doesn't exist\.$|^In Test .*Unexpected file" ../testsuite.log; then
+            echo "::error::Some tests failed"
+            exit 1
+          fi
+
+      - name: Upload the outputs of failed tests
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: failed-tests
+          path: |
+            testsuite.log
+            osm-3s_testing/run/
+          if-no-files-found: ignore
