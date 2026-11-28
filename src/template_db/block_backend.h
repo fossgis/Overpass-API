@@ -25,6 +25,7 @@
 
 #include <cstring>
 #include <map>
+#include <new>
 #include <set>
 
 
@@ -35,18 +36,17 @@ struct Idx_Handle
       : obj(0), ptr_to_raw(0) {}
   ~Idx_Handle()
   {
-    delete obj;
+    clear();
   }
   void set_ptr(uint8* ptr)
   {
-    delete obj;
-    obj = 0;
+    clear();
     ptr_to_raw = ptr;
   }
   const Object& object() const
   {
     if (!obj)
-      obj = new Object(ptr_to_raw);
+      obj = new (storage) Object(ptr_to_raw);
     return *obj;
   }
   uint8* get_ptr_to_raw() const
@@ -54,14 +54,18 @@ struct Idx_Handle
     return ptr_to_raw;
   }
 
-  Idx_Handle(const Idx_Handle& rhs)
-      : obj(0), ptr_to_raw(rhs.ptr_to_raw) {}
-  Idx_Handle& operator=(const Idx_Handle& rhs)
-  {
-    set_ptr(rhs.ptr_to_raw);
-  }
+  Idx_Handle(const Idx_Handle& rhs) = delete;
+  Idx_Handle& operator=(const Idx_Handle& rhs) = delete;
 
 private:
+  void clear()
+  {
+    if (obj)
+      obj->~Object();
+    obj = 0;
+  }
+
+  alignas(Object) mutable unsigned char storage[sizeof(Object)];
   mutable Object* obj;
   uint8* ptr_to_raw;
 };
